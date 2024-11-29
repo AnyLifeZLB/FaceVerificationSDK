@@ -1,18 +1,18 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id("com.google.devtools.ksp").version("1.8.10-1.0.9")
+    id("com.google.devtools.ksp").version("2.0.20-1.0.24")
 }
 
 android {
     namespace 'com.ai.face'
 
-    compileSdk 33
+    compileSdk 34
     defaultConfig {
-        minSdk 21
-        targetSdk 33
+        minSdk 24
+        targetSdk 34
         versionCode 20
-        versionName "1.8.56"
+        versionName "1.8.60"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -27,12 +27,13 @@ android {
         }
     }
 
+    //RTSP 需要调整JDK版本到java 17 以上。查看Preferences-Build-Gradle-JDK 的版本为 17+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_14
-        targetCompatibility JavaVersion.VERSION_14
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_14.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     android {
@@ -68,12 +69,14 @@ dependencies {
     implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
 
 
-    // 人脸识别 试用版本请升级到1.8.60 以上版本。https://github.com/AnyLifeZLB/FaceVerificationSDK
-    // JDK==11，更多查看主页Readme 或者发送邮件到anylife.zlb@gmail.com
+    // 人脸识别 请升级到1.8.60 以上版本。https://github.com/AnyLifeZLB/FaceVerificationSDK
+    // RTSP JDK==17，更多查看主页Readme 或者发送邮件到anylife.zlb@gmail.com
     implementation 'io.github.anylifezlb:FaceRecognition:1.8.60'
 
 
-//    implementation 'com.github.alexeyvasilyev:rtsp-client-android:5.3.1' //RTSP
+    // RTSP 需要调整JDK版本到java 17 以上。查看Preferences-Build-Gradle-JDK 的版本为 17+
+    //RTSP Powered by  https://github.com/alexeyvasilyev/rtsp-client-android
+   implementation 'com.github.alexeyvasilyev:rtsp-client-android:5.3.1' //RTSP
 
 
     // 以下为业务需要其他依赖，不是SDK 运行的必须依赖

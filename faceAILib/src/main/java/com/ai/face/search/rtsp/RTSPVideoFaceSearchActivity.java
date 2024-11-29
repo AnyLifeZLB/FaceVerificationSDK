@@ -15,9 +15,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.PixelCopy;
+import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 
@@ -29,6 +36,8 @@ import com.ai.face.faceSearch.search.SearchProcessBuilder;
 import com.ai.face.faceSearch.search.SearchProcessCallBack;
 import com.ai.face.faceSearch.utils.FaceSearchResult;
 import com.ai.face.search.FaceSearchImageMangerActivity;
+import com.alexvas.rtsp.widget.RtspDataListener;
+import com.alexvas.rtsp.widget.RtspStatusListener;
 
 import java.util.List;
 
@@ -41,6 +50,65 @@ import java.util.List;
 public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
     //如果设备没有补光灯，UI界面背景多一点白色的区域，利用屏幕的光作为补光
     private ActivityFaceSearchRtspBinding  binding;
+
+
+    private final RtspDataListener rtspDataListener=new RtspDataListener() {
+        @Override
+        public void onRtspDataApplicationDataReceived(@NonNull byte[] bytes, int i, int i1, long l) {
+            FaceSearchEngine.Companion.getInstance().runSearch(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+        }
+
+        @Override
+        public void onRtspDataVideoNalUnitReceived(@NonNull byte[] bytes, int i, int i1, long l) {}
+        @Override
+        public void onRtspDataAudioSampleReceived(@NonNull byte[] bytes, int i, int i1, long l) {}
+    };
+
+    private final RtspStatusListener rtspStatusListener=new RtspStatusListener() {
+        @Override
+        public void onRtspStatusConnecting() {
+
+        }
+
+        @Override
+        public void onRtspStatusConnected() {
+            binding.pbLoading.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
+        public void onRtspStatusDisconnecting() {
+
+        }
+
+        @Override
+        public void onRtspStatusDisconnected() {
+
+        }
+
+        @Override
+        public void onRtspStatusFailedUnauthorized() {
+            Toast.makeText(RTSPVideoFaceSearchActivity.this,"RTSP Oauth error",Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onRtspStatusFailed(@Nullable String s) {
+            startRTSP(2000);
+            binding.pbLoading.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onRtspFirstFrameRendered() {
+
+        }
+
+        @Override
+        public void onRtspFrameSizeChanged(int i, int i1) {
+
+        }
+    };
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +123,8 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
 
         });
 
+        binding.ivVideoImage.setStatusListener(rtspStatusListener);
+        binding.ivVideoImage.setDataListener(rtspDataListener);
 
 
         // 2.各种参数的初始化设置 （M：N 建议阈值放低）
@@ -70,7 +140,7 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
                     //人脸搜索匹配成功后白框变绿框，并标记出对应的人脸ID Label（建议用唯一ID 命名人脸图片）
                     @Override
                     public void onFaceMatched(List<FaceSearchResult> result, Bitmap contextBitmap) {
-//                        binding.graphicOverlay.drawRect(result, cameraXFragment);
+                        binding.graphicOverlay.drawRect(result);
 
                         if (!result.isEmpty()) {
                             binding.searchTips.setText("");
@@ -92,8 +162,25 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
 
         //3.初始化r引擎
         FaceSearchEngine.Companion.getInstance().initSearchParams(faceProcessBuilder);
+
+
+        startRTSP(1000);
     }
 
+
+
+    private void startRTSP(long timeDelay){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Uri uri=Uri.parse("rtsp://10.39.175.106/cam/realmonitor?channel=1&subtype=0");
+                binding.ivVideoImage.init(uri,"admin","rtsp1234","rtsp");
+
+                binding.ivVideoImage.start(true,false,true);
+            }
+        }, timeDelay);
+
+    }
 
 
     /**
@@ -154,6 +241,7 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         FaceSearchEngine.Companion.getInstance().stopSearchProcess();
+        binding.ivVideoImage.stop();
     }
 
 

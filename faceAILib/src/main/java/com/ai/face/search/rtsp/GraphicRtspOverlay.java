@@ -1,4 +1,4 @@
-package com.ai.face.search;
+package com.ai.face.search.rtsp;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * 仅供参考，UI样式可以自行设计。甚至SurfaceView 改造
  */
-public class GraphicOverlay extends View {
+public class GraphicRtspOverlay extends View {
     private static final String TAG = "GraphicOverlay";
     private final Paint rectPaint = new Paint();
     private float scaleX = 1.0f;
@@ -29,7 +29,7 @@ public class GraphicOverlay extends View {
     private final Paint textPaint = new Paint();
     private List<FaceSearchResult> rectFList = new ArrayList<>();
 
-    public GraphicOverlay(Context context, @Nullable AttributeSet attrs) {
+    public GraphicRtspOverlay(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
     @Override
@@ -64,10 +64,10 @@ public class GraphicOverlay extends View {
         }
     }
 
-    public void drawRect(List<FaceSearchResult> rectLabels, CameraXFragment cameraXFragment) {
+    public void drawRect(List<FaceSearchResult> rectLabels) {
         this.rectFList = adjustBoundingRect(rectLabels);
-        this.scaleX = cameraXFragment.getScaleX();
-        this.scaleY = cameraXFragment.getScaleY();
+//        this.scaleX = cameraXFragment.getScaleX();
+//        this.scaleY = cameraXFragment.getScaleY();
         postInvalidate();
         requestLayout();
     }

@@ -59,6 +59,12 @@
             android:exported="false">
         </activity>
 
+        <activity
+            android:name=".search.rtsp.RTSPVideoFaceSearchActivity"
+            android:exported="false">
+        </activity>
+
+
 
     </application>
 

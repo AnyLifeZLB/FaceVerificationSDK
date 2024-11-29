@@ -29,7 +29,7 @@ public class WelcomeActivity extends AppCompatActivity {
         findViewById(R.id.goFaceAILib).setOnClickListener(view -> startActivity(new Intent(WelcomeActivity.this, FaceAINaviActivity.class)));
 
         LottieAnimationView startFaceAILib= findViewById(R.id.goFaceAILib);
-        startFaceAILib.setAnimation(R.raw.loading);
+        startFaceAILib.setAnimation(com.ai.face.R.raw.loading);
         startFaceAILib.loop(false);
         startFaceAILib.setSpeed(4f);
         startFaceAILib.playAnimation();

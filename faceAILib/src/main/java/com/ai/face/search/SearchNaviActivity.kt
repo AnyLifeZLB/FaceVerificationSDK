@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.ai.face.databinding.ActivityFaceSearchNaviBinding
 import com.ai.face.search.CopyFaceImageUtils.Companion.copyTestFaceImage
 import com.ai.face.search.CopyFaceImageUtils.Companion.showAppFloat
+import com.ai.face.search.rtsp.RTSPVideoFaceSearchActivity
 import com.lzf.easyfloat.EasyFloat
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks
@@ -40,6 +41,12 @@ class SearchNaviActivity : AppCompatActivity(), PermissionCallbacks {
         binding.faceSearchMn.setOnClickListener {
             startActivity(
                 Intent(this@SearchNaviActivity, FaceSearchMNActivity::class.java)
+            )
+        }
+
+        binding.faceSearchRtsp.setOnClickListener {
+            startActivity(
+                Intent(this@SearchNaviActivity, RTSPVideoFaceSearchActivity::class.java)
             )
         }
 

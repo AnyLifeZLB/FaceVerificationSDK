@@ -4,14 +4,14 @@ plugins {
 
 android {
     namespace 'com.example.mainapp'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         //应用包名
         applicationId "com.ai.face.verifyPub"
 
-        minSdk 21
-        targetSdk 33
+        minSdk 24
+        targetSdk 34
         versionCode 20
         versionName "1.8.60"
 
@@ -20,16 +20,17 @@ android {
 
     buildTypes {
         debug {
-            minifyEnabled true
-            zipAlignEnabled true
-            shrinkResources true
+//            minifyEnabled true
+//            zipAlignEnabled true
+//            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
+    // RTSP 需要调整JDK版本到java 17 以上。查看Preferences-Build-Gradle-JDK 的版本为 17+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_14
-        targetCompatibility JavaVersion.VERSION_14
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
 }

@@ -25,11 +25,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="16:9"/>
 
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/pbLoading"/>
 
-    <com.ai.face.search.GraphicOverlay
+
+    <com.ai.face.search.rtsp.GraphicRtspOverlay
         android:id="@+id/graphicOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="16:9"/>
 
 
     <TextView
@@ -54,7 +70,7 @@
         android:textSize="13sp"
         android:gravity="center"
         android:layout_marginBottom="22dp"
-        android:text="点击管理人脸库"
-        app:layout_constraintBottom_toBottomOf="@+id/fragment_camerax" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="点击管理人脸库" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
