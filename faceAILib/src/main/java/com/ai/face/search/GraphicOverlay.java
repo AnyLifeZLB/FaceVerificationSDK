@@ -72,6 +72,14 @@ public class GraphicOverlay extends View {
         requestLayout();
     }
 
+
+    public void drawRect(List<FaceSearchResult> rectLabels) {
+        this.rectFList = adjustBoundingRect(rectLabels);
+        postInvalidate();
+        requestLayout();
+    }
+
+
     private int translateX(int x) {
         return (int) (scaleX * x);
     }

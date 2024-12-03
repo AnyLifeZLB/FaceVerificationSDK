@@ -37,7 +37,7 @@
         android:id="@+id/pbLoading"/>
 
 
-    <com.ai.face.search.rtsp.GraphicRtspOverlay
+    <com.ai.face.search.GraphicOverlay
         android:id="@+id/graphicOverlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
