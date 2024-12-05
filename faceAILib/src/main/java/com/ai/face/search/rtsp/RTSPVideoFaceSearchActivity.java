@@ -152,6 +152,7 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
         binding.ivVideoImage.setOnRtspImageBitmapListener(bitmap -> {
             //It is Main UI  Thread , post task to background thread
             singleThreadExecutor.execute(()->{
+                //注意Bitmap 的内存管理，压缩但不能影响效果。目前SDK内部还没有处理
                 Log.d("RTSP","Thread Name: "+Thread.currentThread().getName());
                 FaceSearchEngine.Companion.getInstance().runSearch(bitmap);
             });

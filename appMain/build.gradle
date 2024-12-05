@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.mainapp'
+    namespace 'com.example.mainapp.rtsp'
     compileSdk 34
 
     defaultConfig {
