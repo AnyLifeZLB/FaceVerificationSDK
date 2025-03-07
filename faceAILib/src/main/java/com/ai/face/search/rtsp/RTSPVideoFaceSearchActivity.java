@@ -10,53 +10,43 @@ import static com.ai.face.faceSearch.search.SearchProcessTipsCode.NO_MATCHED;
 import static com.ai.face.faceSearch.search.SearchProcessTipsCode.SEARCHING;
 import static com.ai.face.faceSearch.search.SearchProcessTipsCode.THRESHOLD_ERROR;
 import static com.ai.face.faceSearch.search.SearchProcessTipsCode.TOO_MUCH_FACE;
-
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.PixelCopy;
 import android.view.View;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.CameraSelector;
-
 import com.ai.face.R;
-import com.ai.face.base.view.CameraXFragment;
 import com.ai.face.databinding.ActivityFaceSearchRtspBinding;
 import com.ai.face.faceSearch.search.FaceSearchEngine;
 import com.ai.face.faceSearch.search.SearchProcessBuilder;
 import com.ai.face.faceSearch.search.SearchProcessCallBack;
 import com.ai.face.faceSearch.utils.FaceSearchResult;
 import com.ai.face.search.FaceSearchImageMangerActivity;
-import com.alexvas.rtsp.widget.RtspDataListener;
-import com.alexvas.rtsp.widget.RtspImageView;
 import com.alexvas.rtsp.widget.RtspStatusListener;
-
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
 /**
- * RTSP 视频流人脸搜索
- * RTSP Play，Powered by https://github.com/alexeyvasilyev/rtsp-client-android
+ * RTSP 视频流人脸搜索，难点之一人脸不会对准你的摄像头
  *
+ * 图像分辨率不能太高，你的设备性能配置不一定能跟上，否则闪退！！
+ *
+ * 这个RTSP 库 compileSdk 35 ；minSDK=24, java version =17;gradle sdk也要同步改为17
+ *
+ * 然后AS invalidate 后 重启IDE 生效,同步依赖要花费不少时间，耐心等待处理
  */
 public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
     //如果设备没有补光灯，UI界面背景多一点白色的区域，利用屏幕的光作为补光
     private ActivityFaceSearchRtspBinding  binding;
 
     private final ExecutorService singleThreadExecutor  = Executors.newSingleThreadExecutor();
-
 
     private final RtspStatusListener rtspStatusListener=new RtspStatusListener() {
         @Override
@@ -83,7 +73,7 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
 
         @Override
         public void onRtspStatusFailed(@Nullable String s) {
-            startRTSP(2000);
+            startRTSP(2000);//重新连接
             binding.pbLoading.setVisibility(View.VISIBLE);
         }
 
@@ -115,14 +105,14 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
         // 2.各种参数的初始化设置 （M：N 建议阈值放低）
         SearchProcessBuilder faceProcessBuilder = new SearchProcessBuilder.Builder(this)
                 .setLifecycleOwner(this)
-                .setThreshold(0.85f)            //识别成功阈值设置，范围仅限 0.85-0.95！默认0.85
+                .setThreshold(0.8f)            //识别成功阈值设置，范围仅限 0.85-0.95！默认0.85
                 .setFaceLibFolder(CACHE_SEARCH_FACE_DIR)  //内部存储目录中保存N 个图片库的目录
                 .setSearchType(SearchProcessBuilder.SearchType.N_SEARCH_M) //M:N 搜索
                 .setProcessCallBack(new SearchProcessCallBack() {
 
-                    //坐标框和对应的 搜索匹配到的图片标签
-                    //人脸检测成功后画白框，此时还没有标签字段
-                    //人脸搜索匹配成功后白框变绿框，并标记出对应的人脸ID Label（建议用唯一ID 命名人脸图片）
+                    // 坐标框和对应的 搜索匹配到的图片标签
+                    // 人脸检测成功后画白框，此时还没有标签字段
+                    // 人脸搜索匹配成功后白框变绿框，并标记出对应的人脸ID Label（建议用唯一ID 命名人脸图片）
                     @Override
                     public void onFaceMatched(List<FaceSearchResult> result, Bitmap contextBitmap) {
                         binding.graphicOverlay.drawRect(result);
@@ -169,13 +159,10 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
      * @param timeDelay 延迟多久后开始播放
      */
     private void startRTSP(long timeDelay){
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Uri uri=Uri.parse("rtsp://10.39.175.106/cam/realmonitor?channel=1&subtype=0");
-                binding.ivVideoImage.init(uri,"admin","rtsp1234","rtsp");
-                binding.ivVideoImage.start(true,false,false);
-            }
+        new Handler().postDelayed(() -> {
+            Uri uri=Uri.parse("rtsp://10.39.175.106/cam/realmonitor?channel=1&subtype=0");
+            binding.ivVideoImage.init(uri,"admin","rtsp1234","rtsp");
+            binding.ivVideoImage.start(true,false,false);
         }, timeDelay);
 
     }
@@ -231,7 +218,6 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      * 销毁，停止
      */
@@ -241,6 +227,5 @@ public class RTSPVideoFaceSearchActivity extends AppCompatActivity {
         FaceSearchEngine.Companion.getInstance().stopSearchProcess();
         binding.ivVideoImage.stop();
     }
-
 
 }

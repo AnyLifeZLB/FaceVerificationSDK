@@ -244,7 +244,7 @@ public class BinocularUVCCameraFragment extends AbstractBinocularUVCCameraFragme
                         break;
 
                     case VerifyStatus.VERIFY_DETECT_TIPS_ENUM.ACTION_NO_BASE_IMG:
-                        tipsTextView.setText(R.string.no_base_face_bitmap);
+                        tipsTextView.setText("no_base_face_bitmap !");
                         break;
                     case VerifyStatus.VERIFY_DETECT_TIPS_ENUM.ACTION_FAILED:
                         tipsTextView.setText(R.string.motion_liveness_detection_failed);

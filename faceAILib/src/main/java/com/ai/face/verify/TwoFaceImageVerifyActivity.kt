@@ -18,7 +18,6 @@ import android.provider.MediaStore
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.ai.face.BuildConfig
 import com.ai.face.base.baseImage.FaceAIUtils
 import com.ai.face.databinding.ActivityTwoFaceImageVerifyBinding
 import com.ai.face.faceVerify.verify.VerifyUtils
@@ -48,7 +47,7 @@ class TwoFaceImageVerifyActivity : AppCompatActivity() {
         viewBinding = ActivityTwoFaceImageVerifyBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        FileOperator.init(application, BuildConfig.DEBUG)
+        FileOperator.init(application, true)
 
         viewBinding.back.setOnClickListener { this@TwoFaceImageVerifyActivity.finish() }
 

@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id("com.google.devtools.ksp").version("1.8.10-1.0.9")
+    id("com.google.devtools.ksp").version("1.9.20-1.0.14")
 }
 
 android {
@@ -15,8 +15,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     android {
@@ -44,6 +44,7 @@ dependencies {
 
 
     // 以下为业务需要其他依赖，不是SDK 运行的必须依赖
+    implementation 'com.github.alexeyvasilyev:rtsp-client-android:5.3.4'
     implementation 'pub.devrel:easypermissions:3.0.0'
     api 'com.airbnb.android:lottie:6.0.0'
     implementation 'com.github.princekin-f:EasyFloat:2.0.4'

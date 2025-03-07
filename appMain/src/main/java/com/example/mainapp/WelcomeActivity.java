@@ -3,6 +3,7 @@ package com.example.mainapp;
 import android.animation.Animator;
 import android.content.Intent;
 import android.os.Bundle;
+import com.airbnb.lottie.BuildConfig;
 import com.airbnb.lottie.LottieAnimationView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -65,7 +66,5 @@ public class WelcomeActivity extends AppCompatActivity {
 
 
     }
-
-
 
 }
