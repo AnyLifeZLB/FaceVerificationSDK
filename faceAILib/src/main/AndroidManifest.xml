@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-feature android:name="android.hardware.camera" />
-    <!-- 演示提示用 -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <!-- 语音提示 -->
     <queries>
         <intent>
@@ -16,7 +8,20 @@
         </intent>
     </queries>
 
+    <uses-permission android:name="com.android.vending.CHECK_LICENSE" />
+
+
     <application>
+
+        <activity
+            android:name=".UVCCamera.BinocularUVCCameraActivity"
+            android:theme="@style/FaceAITheme"
+            android:exported="true"/>
+
+        <activity
+            android:name=".UVCCamera.addFace.AddFaceUVCCameraActivity"
+            android:theme="@style/FaceAITheme"
+            android:exported="true"/>
 
         <activity
             android:name=".FaceAINaviActivity"
@@ -24,9 +29,16 @@
             android:exported="false">
         </activity>
 
+        <activity
+            android:name=".verify.TwoFaceImageVerifyActivity"
+            android:configChanges="orientation"
+            android:theme="@style/FaceAITheme"
+            android:exported="false">
+        </activity>
 
         <activity
             android:name=".verify.FaceVerificationActivity"
+            android:theme="@style/FaceAITheme"
             android:exported="false"/>
 
         <activity
@@ -35,24 +47,29 @@
 
         <activity
             android:name=".addFaceImage.AddFaceImageActivity"
+            android:theme="@style/FaceAITheme"
             android:exported="false" />
-
 
         <activity
             android:name=".search.FaceSearch1NActivity"
+            android:theme="@style/FaceAITheme"
             android:exported="false" />
-
 
         <activity
             android:name=".search.FaceSearchMNActivity"
             android:exported="false"
             android:launchMode="singleTop" />
 
-
         <activity
             android:name=".search.FaceSearchImageMangerActivity"
             android:exported="false">
         </activity>
+
+        <activity
+            android:name=".verify.FaceVerifyWelcomeActivity"
+            android:exported="false">
+        </activity>
+
 
         <activity
             android:name=".search.SearchNaviActivity"

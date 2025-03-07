@@ -3,20 +3,22 @@ package com.ai.face
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.ai.face.FaceAIConfig.CACHE_BASE_FACE_DIR
-import com.ai.face.addFaceImage.AddFaceImageActivity
 import com.ai.face.databinding.ActivityFaceAiNaviBinding
 import com.ai.face.search.SearchNaviActivity
+import com.ai.face.utils.SystemUtil
 import com.ai.face.utils.VoicePlayer
-import com.ai.face.verify.FaceVerificationActivity
-import com.ai.face.verify.FaceVerificationActivity.BASE_FACE_DIR_KEY
-import com.ai.face.verify.FaceVerificationActivity.USER_FACE_ID_KEY
+import com.ai.face.verify.FaceVerifyWelcomeActivity
+import com.ai.face.verify.TwoFaceImageVerifyActivity
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks
+
 
 /**
  * SDK 接入演示Demo，请先熟悉本Demo跑通住流程后再集成到你的主工程验证业务
@@ -24,8 +26,6 @@ import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks
  */
 class FaceAINaviActivity : AppCompatActivity(), PermissionCallbacks {
     private lateinit var viewBinding: ActivityFaceAiNaviBinding
-
-    private var yourUniQueFaceId = "18707611416"  //用户人脸ID，Face ID（unique）eg account
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,67 +39,55 @@ class FaceAINaviActivity : AppCompatActivity(), PermissionCallbacks {
         VoicePlayer.getInstance().init(this)
 
 
-
-        //测试两张静态人脸图是否同一人
-//        val value = VerifyUtils.evaluateFaceSimi(
-//            baseContext,
-//            VerifyUtils.getBitmapFromAssert(baseContext, "model_1.png"),
-//            VerifyUtils.getBitmapFromAssert(baseContext, "model.jpg")
-//        )
-//        Log.d("VerifyUtils", "two face similarity value:  $value")
-
-
-        viewBinding.faceVerifyCard.setOnLongClickListener {
-            startActivity(
-                Intent(this@FaceAINaviActivity, FaceVerificationActivity::class.java)
-                    .putExtra(USER_FACE_ID_KEY, yourUniQueFaceId)     //1:1 底片人脸ID
-                    .putExtra(BASE_FACE_DIR_KEY, CACHE_BASE_FACE_DIR) //保存目录
-            )
-            true
+        //分享
+        viewBinding.shareLayout.setOnClickListener {
+            val intent = Intent()
+            intent.setAction(Intent.ACTION_SEND)
+            intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_faceai_sdk_content))
+            intent.setType("text/plain")
+            startActivity(intent)
         }
 
-
+        //1:1 人脸识别
         viewBinding.faceVerifyCard.setOnClickListener {
-            //1:1 人脸识别先录一张人脸底片
-            val baseFacePath=CACHE_BASE_FACE_DIR+yourUniQueFaceId
-            if (BitmapFactory.decodeFile(baseFacePath) != null) {
-                startActivity(
-                    Intent(this@FaceAINaviActivity, FaceVerificationActivity::class.java)
-                        .putExtra(USER_FACE_ID_KEY, yourUniQueFaceId)     //1:1 底片人脸ID
-                        .putExtra(BASE_FACE_DIR_KEY, CACHE_BASE_FACE_DIR) //保存目录
-                )
-            } else {
-                Toast.makeText(this@FaceAINaviActivity, R.string.add_a_face_image, Toast.LENGTH_LONG).show()
-            }
-        }
 
-
-        //添加1：1人脸识别底片
-        viewBinding.updateBaseImage.setOnClickListener {
-            startActivity(
-                Intent(this@FaceAINaviActivity, AddFaceImageActivity::class.java)
-                    .putExtra(USER_FACE_ID_KEY, yourUniQueFaceId)
-                    .putExtra(BASE_FACE_DIR_KEY, CACHE_BASE_FACE_DIR)
+            val enumIntent = Intent(baseContext, FaceVerifyWelcomeActivity::class.java)
+            val bundle = Bundle()
+            bundle.putSerializable(FaceVerifyWelcomeActivity.FACE_VERIFY_DATA_SOURCE_TYPE,
+                FaceVerifyWelcomeActivity.DataSourceType.Android_HAL
             )
+            enumIntent.putExtras(bundle)
+            startActivity(enumIntent)
         }
 
 
-
-        viewBinding.faceSearch1N.setOnClickListener {
+        // 1:N， M：N 人脸搜索
+        viewBinding.faceSearch.setOnClickListener {
             startActivity(Intent(this@FaceAINaviActivity, SearchNaviActivity::class.java))
         }
 
+
+        //双目摄像头，请确认你的双目UVC摄像头参数符合程序要求
+        viewBinding.binocularCamera.setOnClickListener {
+            showConnectUVCCameraDialog()
+        }
 
         viewBinding.moreAboutMe.setOnClickListener {
             startActivity(Intent(this@FaceAINaviActivity, AboutFaceAppActivity::class.java))
         }
 
 
+        //两张静态人脸图中人脸相似度 对比
+        viewBinding.twoFaceVerify.setOnClickListener {
+            startActivity(Intent(this@FaceAINaviActivity, TwoFaceImageVerifyActivity::class.java))
+        }
+
+
+        //切换前后摄像头
         viewBinding.changeCamera.setOnClickListener {
             val sharedPref = getSharedPreferences(
                 "faceVerify", Context.MODE_PRIVATE
             )
-
             if (sharedPref.getInt("cameraFlag", 0) == 1) {
                 sharedPref.edit().putInt("cameraFlag", 0).apply()
                 Toast.makeText(
@@ -117,6 +105,7 @@ class FaceAINaviActivity : AppCompatActivity(), PermissionCallbacks {
             }
         }
 
+        showSystemParameter()
     }
 
 
@@ -158,7 +147,52 @@ class FaceAINaviActivity : AppCompatActivity(), PermissionCallbacks {
      * 当用户点击了不再提醒的时候的处理方式
      */
     override fun onPermissionsDenied(requestCode: Int, perms: List<String>) {
-        Toast.makeText(this, "Please Oauth Permission,请授权才能正常演示", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Please Grant Permission To Run FaceAI SDK,请授权才能正常演示", Toast.LENGTH_SHORT)
+            .show()
     }
+
+
+    private fun showSystemParameter() {
+        val TAG = "系统参数："
+        Log.e(TAG, "签名SHA1：" + SystemUtil.getSHA1(baseContext))
+        Log.e(TAG, "设备厂商：" + SystemUtil.getDeviceBrand())
+        Log.e(TAG, "设备型号：" + SystemUtil.getSystemModel())
+        Log.e(TAG, "Android系统版本号：" + SystemUtil.getSystemVersion())
+    }
+
+
+    /**
+     * 确认是否连接好了双目摄像头
+     *
+     */
+    private fun showConnectUVCCameraDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialog = builder.create()
+        val dialogView = View.inflate(this, R.layout.dialog_connect_uvc_camera, null)
+
+        //设置对话框布局
+        dialog.setView(dialogView)
+
+        val btnOK = dialogView.findViewById<Button>(R.id.btn_ok)
+
+        btnOK.setOnClickListener { v: View? ->
+            val enumIntent = Intent(baseContext, FaceVerifyWelcomeActivity::class.java)
+            val bundle = Bundle()
+            bundle.putSerializable(FaceVerifyWelcomeActivity.FACE_VERIFY_DATA_SOURCE_TYPE,
+                FaceVerifyWelcomeActivity.DataSourceType.UVC
+            )
+            enumIntent.putExtras(bundle)
+            startActivity(enumIntent)
+
+//            startActivity(Intent(this@FaceAINaviActivity, BinocularUVCCameraActivity::class.java))
+            dialog.dismiss()
+        }
+
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+    }
+
+
+
 
 }

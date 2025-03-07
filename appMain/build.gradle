@@ -3,46 +3,93 @@ plugins {
 }
 
 android {
-    namespace 'com.example.mainapp.rtsp'
-    compileSdk 34
+    namespace 'com.example.mainapp'
+    compileSdk 34 //Google Play 需要34 了
 
     defaultConfig {
         //应用包名
         applicationId "com.ai.face.verifyPub"
 
-        minSdk 24
-        targetSdk 34
-        versionCode 20
-        versionName "1.8.60"
+        minSdk 21
+        targetSdk 34  //target SDK 还是28 的请参考question.md 文档说明
+
+        versionCode 44
+        versionName "1.9.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("FaceAIPublic")
+            storePassword "FaceAIPublic"
+            keyAlias "FaceAIPublic"
+            keyPassword "FaceAIPublic"
+        }
     }
 
     buildTypes {
         debug {
-//            minifyEnabled true
-//            zipAlignEnabled true
-//            shrinkResources true
+            minifyEnabled true
+            shrinkResources false
+            jniDebuggable true
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+
+        release {
+            minifyEnabled true
+            shrinkResources true
+            jniDebuggable false
+            minifyEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
     }
 
-    // RTSP 需要调整JDK版本到java 17 以上。查看Preferences-Build-Gradle-JDK 的版本为 17+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
     }
 
 }
 
 
+//根据Compile SDK 不同，各自项目依赖体系不一样
+//主工程和SDK 中的依赖有冲突需要统一依赖,可以参考下面方式处理
+//比如TargetSDK 还是28的camera_version降低到 1.2.3（最后支持TargetSDK 28）
+//更多错误请自行Google，百度搜索解决方法，集成问题不是SDK内部原因，谢谢
+def camera_version = "1.2.3" //建议新工程升级到最新版本1.4.1 以上
+configurations.configureEach {
+    resolutionStrategy {
+        force "androidx.camera:camera-core:$camera_version",
+                "androidx.camera:camera-camera2:$camera_version",
+                "androidx.camera:camera-lifecycle:$camera_version",
+                "androidx.camera:camera-view:$camera_version"
+    }
+}
+
+
+
 dependencies {
+    //在你的项目主工程依赖faceAILib，熟悉了SDK 接入源码后再根据你的业务修改实现
     implementation project(':faceAILib')
 
+
     // Demo 为了收集 Crash。
-    implementation 'com.tencent.bugly:crashreport:4.1.9.3'
+//    implementation 'com.tencent.bugly:crashreport:4.1.9.3'
 
     implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }
-

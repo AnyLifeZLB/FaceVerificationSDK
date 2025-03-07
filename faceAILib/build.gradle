@@ -1,45 +1,28 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id("com.google.devtools.ksp").version("2.0.20-1.0.24")
+    id("com.google.devtools.ksp").version("1.8.10-1.0.9")
 }
 
 android {
     namespace 'com.ai.face'
 
-    compileSdk 34
+    compileSdk 33
     defaultConfig {
-        minSdk 24
-        targetSdk 34
-        versionCode 20
-        versionName "1.8.60"
+        minSdk 21
+        targetSdk 33 //target SDK 还是28 的请参考question.md 文档说明
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
-        release {
-            debuggable false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-        //Debug 包可以体验所有的功能，不用授权
-        debug {
-            debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
 
-    //RTSP 需要调整JDK版本到java 17 以上。查看Preferences-Build-Gradle-JDK 的版本为 17+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     android {
         defaultConfig {
             ndk {
-                abiFilters 'armeabi-v7a', 'arm64-v8a'
+                abiFilters 'armeabi-v7a','arm64-v8a'
             }
         }
     }
@@ -47,36 +30,17 @@ android {
     buildFeatures {
         viewBinding true
     }
+
 }
-
-//根据Compile SDK 不同，各自项目依赖体系不一样
-//主工程和SDK 中的依赖有冲突需要统一依赖,可以参考下面方式处理
-//比如TargetSDK 还是28的camera_version降低到 1.2.3（最后支持TargetSDK 28）
-
-def camera_version = "1.4.0" //建议新工程升级到最新版本1.4.0 以上
-configurations.configureEach {
-    resolutionStrategy {
-        force "androidx.camera:camera-core:$camera_version",
-                "androidx.camera:camera-camera2:$camera_version",
-                "androidx.camera:camera-lifecycle:$camera_version",
-                "androidx.camera:camera-view:$camera_version"
-    }
-}
-
-
 // GitHub 无法访问，挂梯子也无效 ？参考 https://github.com/maxiaof/github-hosts
+
+
 dependencies {
-    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+    // 人脸识别  请升级到1.9.0 以上版本。https://github.com/AnyLifeZLB/FaceVerificationSDK
+    implementation 'io.github.anylifezlb:FaceAISDK:1.9.3' //新的依赖方式改了后缀
 
-
-    // 人脸识别 请升级到1.8.60 以上版本。https://github.com/AnyLifeZLB/FaceVerificationSDK
-    // RTSP JDK==17，更多查看主页Readme 或者发送邮件到anylife.zlb@gmail.com
-    implementation 'io.github.anylifezlb:FaceRecognition:1.8.63'
-
-
-    // RTSP 需要调整JDK版本到java 17 以上。查看Preferences-Build-Gradle-JDK 的版本为 17+
-    //RTSP Powered by  https://github.com/alexeyvasilyev/rtsp-client-android
-   implementation 'com.github.alexeyvasilyev:rtsp-client-android:5.3.1' //RTSP
+    //USB红外双目摄像头用lib 目录libuvccamera-1.0.9 AAR管理，用户可以自行用熟悉方案
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 
 
     // 以下为业务需要其他依赖，不是SDK 运行的必须依赖
@@ -86,15 +50,15 @@ dependencies {
     implementation "androidx.cardview:cardview:1.0.0"
     implementation "androidx.recyclerview:recyclerview:1.3.2"
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.8'
-
     implementation("com.github.bumptech.glide:glide:4.16.0")
     ksp("com.github.bumptech.glide:ksp:4.16.0")
-
-    // App compat and UI  things
     implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
+    //选照片，用于静态的图人脸对比，使用详情见 https://github.com/javakam/FileOperator
+    implementation 'com.github.javakam:file.core:3.9.8@aar'      //核心库必选(Core library required)
+    implementation 'com.github.javakam:file.selector:3.9.8@aar'  //文件选择器(File selector)
+    implementation 'com.github.javakam:file.compressor:3.9.8@aar'//图片压缩,修改自Luban
+
+
 }
-
-
-

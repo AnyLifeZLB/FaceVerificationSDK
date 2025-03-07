@@ -22,7 +22,6 @@ import com.ai.face.faceSearch.search.FaceSearchEngine;
 import com.ai.face.faceSearch.search.SearchProcessBuilder;
 import com.ai.face.faceSearch.search.SearchProcessCallBack;
 import com.ai.face.faceSearch.utils.FaceSearchResult;
-import com.ai.face.faceVerify.verify.VerifyUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
@@ -79,6 +78,7 @@ public class FaceSearch1NActivity extends AppCompatActivity {
                 .setNeedMultiValidate(false) //是否需要确认机制防止误识别，低配置设备影响搜索速度
                 .setFaceLibFolder(CACHE_SEARCH_FACE_DIR)  //内部存储目录中保存N 个图片库的目录
                 .setImageFlipped(cameraLens == CameraSelector.LENS_FACING_FRONT) //手机的前置摄像头imageProxy 拿到的图可能左右翻转
+//                .setLicenseKey("FaceAIVIPLicense")
                 .setProcessCallBack(new SearchProcessCallBack() {
                     /**
                      * 匹配到的大于 Threshold的所有结果，如有多个很相似的人场景允许的话可以弹框让用户选择
@@ -96,7 +96,7 @@ public class FaceSearch1NActivity extends AppCompatActivity {
                                 .load(CACHE_SEARCH_FACE_DIR + faceID)
                                 .skipMemoryCache(true)
                                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                .transform(new RoundedCorners(11))
+                                .transform(new RoundedCorners(12))
                                 .into(binding.image);
                     }
 
@@ -148,7 +148,7 @@ public class FaceSearch1NActivity extends AppCompatActivity {
      * @param code
      */
     private void showPrecessTips(int code) {
-        binding.image.setImageResource(R.drawable.logo);
+        binding.image.setImageResource(R.drawable.face_logo);
         switch (code) {
             default:
                 binding.searchTips.setText("Tips Code：" + code);

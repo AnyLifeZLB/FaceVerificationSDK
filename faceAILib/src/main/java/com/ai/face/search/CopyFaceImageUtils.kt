@@ -97,13 +97,13 @@ class CopyFaceImageUtils {
 
                         //insertOrUpdateFaceImage 处理人脸图入库，里面会检测裁剪人脸，图像量化处理；
                         // 插入失败请看onFailed log
-                        FaceSearchImagesManger.IL1Iii.getInstance(context).insertOrUpdateFaceImage(
+                        FaceSearchImagesManger.Companion.getInstance(context).insertOrUpdateFaceImage(
                             originBitmap, fileName,object :FaceSearchImagesManger.Callback {
                                 override fun onSuccess() {
-                                    Log.d("Add Face","Add Face successful"+faceFiles[index]);
+                                    Log.d("Add Face","Add Face successful：  "+faceFiles[index]);
                                 }
                                 override fun onFailed(msg: String) {
-                                    Log.e("Add Face","Add Face onFailed"+faceFiles[index]);
+                                    Log.e("Add Face","Add Face onFailed：  "+faceFiles[index]);
                                 }
 
                             }
